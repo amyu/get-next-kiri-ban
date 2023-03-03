@@ -19,7 +19,7 @@ async function run(): Promise<void> {
       )
       lastNumber = pullRequests.data[0].number
     }
-    core.setFailed(`lastNumber: ${lastNumber}`)
+    core.info(`lastNumber: ${lastNumber}`)
 
     if (!lastNumber) {
       // not found
@@ -34,12 +34,14 @@ async function run(): Promise<void> {
       // ゾロ目だっとき
       if (nextNumber.match(/^(\d)\1*$/)) {
         core.setOutput('next', i)
+        core.info(`nextNumber: ${nextNumber} ゾロ目`)
         return Promise.resolve()
       }
 
       // 先頭以外がすべて0のとき
-      if (nextNumber.match(/^[1-9]\d*0*$/)) {
+      if (nextNumber.match(/^[1-9]0*$/)) {
         core.setOutput('next', i)
+        core.info(`nextNumber: ${nextNumber} 先頭以外がすべて0`)
         return Promise.resolve()
       }
     }
