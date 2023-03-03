@@ -1,16 +1,50 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {context, getOctokit} from '@actions/github'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const token = core.getInput('github-token', {required: true})
+    const octokit = getOctokit(token)
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    let lastNumber: number | undefined
+    if (context.issue.number) {
+      lastNumber = context.issue.number
+    } else {
+      const pullRequests = await octokit.request(
+        'GET /repos/{owner}/{repo}/pulls',
+        {
+          owner: context.repo.owner,
+          repo: context.repo.repo
+        }
+      )
+      lastNumber = pullRequests.data[0].number
+    }
+    core.setFailed(`lastNumber: ${lastNumber}`)
 
-    core.setOutput('time', new Date().toTimeString())
+    if (!lastNumber) {
+      // not found
+      core.setOutput('next', undefined)
+      return Promise.resolve()
+    }
+
+    // 固定で10個先まで見ている すでにキリ番だった時を考慮して1から始めている
+    // まぁInputで受け取ってもいいかもしれない
+    for (let i = 1; i <= 11; i++) {
+      const nextNumber = (lastNumber + i).toString()
+      // ゾロ目だっとき
+      if (nextNumber.match(/^(\d)\1*$/)) {
+        core.setOutput('next', i)
+        return Promise.resolve()
+      }
+
+      // 先頭以外がすべて0のとき
+      if (nextNumber.match(/^[1-9]\d*0*$/)) {
+        core.setOutput('next', i)
+        return Promise.resolve()
+      }
+    }
+
+    core.setOutput('next', undefined)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
