@@ -19,8 +19,11 @@ steps:
     id: kiri
       
   # - run: post to slack, etc...
-  - run: echo "The number remaining until the next 'Kiri Ban' is  ${{ steps.kiri.outputs.next }}"
+  - if: steps.kiri.outputs.next != ''
+    run: echo "The number remaining until the next 'Kiri Ban' is  ${{ steps.kiri.outputs.next }}"
 ```
+
+I would recommend running it in `pull_request` or `push` event as I definitely don't want to miss a `kiri Ban`!
 
 # License
 
