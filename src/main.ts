@@ -6,6 +6,15 @@ async function run(): Promise<void> {
     const token = core.getInput('github-token', {required: true})
     const octokit = getOctokit(token)
 
+    const pullRequestsHoge = await octokit.request(
+      'GET /repos/{owner}/{repo}/pulls',
+      {
+        owner: context.repo.owner,
+        repo: context.repo.repo
+      }
+    )
+    core.info(JSON.stringify(pullRequestsHoge))
+
     let lastNumber: number | undefined
     if (context.issue.number) {
       lastNumber = context.issue.number

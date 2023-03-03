@@ -46,6 +46,11 @@ function run() {
         try {
             const token = core.getInput('github-token', { required: true });
             const octokit = (0, github_1.getOctokit)(token);
+            const pullRequestsHoge = yield octokit.request('GET /repos/{owner}/{repo}/pulls', {
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo
+            });
+            core.info(JSON.stringify(pullRequestsHoge));
             let lastNumber;
             if (github_1.context.issue.number) {
                 lastNumber = github_1.context.issue.number;
