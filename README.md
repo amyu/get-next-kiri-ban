@@ -3,7 +3,7 @@
 'Kiri Ban' is an old Japanese Internet culture  
 It means that all numbers except the first one are 0, for example 1000, or all numbers are the same, for example 7777.  
 
-You can use this Actions to get the 'Kiri Ban'
+This Actions can get the number of PullRequests until the next 'Kiri Ban'.
 
 
 # Usage
